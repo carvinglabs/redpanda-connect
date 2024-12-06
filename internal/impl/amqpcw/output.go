@@ -17,8 +17,10 @@ package amqpcw
 import (
 	"context"
 	"crypto/tls"
+	b64 "encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/redpanda-data/connect/v4/public/components/phpserialize"
 	"net/url"
 	"strconv"
 	"strings"
@@ -438,10 +440,40 @@ func (a *amqpCWWriter) Write(ctx context.Context, msg *service.Message) error {
 		ctx, cancel = context.WithTimeout(ctx, a.timeout)
 		defer cancel()
 	}
+	/*
+		msgBytes, err := msg.AsBytes()
+		if err != nil {
+			return err
+		}
+	*/
 
-	msgBytes, err := msg.AsBytes()
+	var msgBytes []byte
+
+	encoding, err := a.contentEncoding.TryString(msg)
 	if err != nil {
-		return err
+		return fmt.Errorf("msg type interpolation error: %w", err)
+	}
+
+	msgStruct, _ := msg.AsStructured()
+	ev := ConnectTaskRecordEvent{
+		ClassName: "CaptainWallet\\Integration\\Connect\\ConnectTaskRecordEvent",
+		Account:   a.account,
+		TaskName:  a.taskName,
+		Offset:    0,
+		Record:    msgStruct,
+	}
+
+	out, err := phpserialize.Marshal(ev, nil)
+	if err != nil {
+		return fmt.Errorf("msg serialization error: %w", err)
+	}
+
+	fmt.Println(string(out))
+
+	if encoding == "base64" {
+		msgBytes = []byte(b64.StdEncoding.EncodeToString(out))
+	} else {
+		msgBytes = out
 	}
 
 	bindingKey, err := a.key.TryString(msg)
