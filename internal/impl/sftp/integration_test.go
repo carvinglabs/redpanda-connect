@@ -90,6 +90,7 @@ input:
       password: pass
     codec: $VAR1
     delete_on_finish: false
+    rename_on_finish: false
     watcher:
       enabled: $VAR2
       minimum_age: 100ms

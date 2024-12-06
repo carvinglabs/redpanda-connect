@@ -34,6 +34,7 @@ const (
 	siFieldCredentials         = "credentials"
 	siFieldPaths               = "paths"
 	siFieldDeleteOnFinish      = "delete_on_finish"
+	siFieldRenameOnFinish      = "rename_on_finish"
 	siFieldWatcher             = "watcher"
 	siFieldWatcherEnabled      = "enabled"
 	siFieldWatcherMinimumAge   = "minimum_age"
@@ -68,6 +69,10 @@ You can access these metadata fields using xref:configuration:interpolation.adoc
 		Fields(
 			service.NewBoolField(siFieldDeleteOnFinish).
 				Description("Whether to delete files from the server once they are processed.").
+				Advanced().
+				Default(false),
+			service.NewBoolField(siFieldRenameOnFinish).
+				Description("Whether to rename files on the server once they are processed.").
 				Advanced().
 				Default(false),
 			service.NewObjectField(siFieldWatcher,
@@ -115,6 +120,7 @@ type sftpReader struct {
 	creds          credentials
 	scannerCtor    codec.DeprecatedFallbackCodec
 	deleteOnFinish bool
+	renameOnFinish bool
 
 	watcherEnabled      bool
 	watcherCache        string
@@ -149,6 +155,9 @@ func newSFTPReaderFromParsed(conf *service.ParsedConfig, mgr *service.Resources)
 		return
 	}
 	if s.deleteOnFinish, err = conf.FieldBool(siFieldDeleteOnFinish); err != nil {
+		return
+	}
+	if s.renameOnFinish, err = conf.FieldBool(siFieldRenameOnFinish); err != nil {
 		return
 	}
 
@@ -248,6 +257,25 @@ func (s *sftpReader) Connect(ctx context.Context) (err error) {
 			if outErr == nil {
 				if outErr = client.Remove(nextPath); outErr != nil {
 					outErr = fmt.Errorf("remove %v: %w", nextPath, outErr)
+				}
+			}
+			s.scannerMut.Unlock()
+		} else if s.renameOnFinish {
+			s.scannerMut.Lock()
+			client := s.client
+			if client == nil {
+				if client, outErr = s.creds.GetClient(s.mgr.FS(), s.address); outErr != nil {
+					outErr = fmt.Errorf("obtain private client: %w", outErr)
+				}
+				defer func() {
+					_ = client.Close()
+				}()
+			}
+			if outErr == nil {
+				newPath := fmt.Sprintf("%s.processed-%d", nextPath, time.Now().Unix())
+				s.log.Infof("Renaming file to: %s", newPath)
+				if outErr = client.Rename(nextPath, newPath); outErr != nil {
+					outErr = fmt.Errorf("rename %v to %v: %w", nextPath, newPath, outErr)
 				}
 			}
 			s.scannerMut.Unlock()
