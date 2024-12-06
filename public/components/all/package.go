@@ -15,15 +15,14 @@ package all
 import (
 	// Import all community components.
 	_ "github.com/redpanda-data/connect/v4/public/components/community"
-
 	// Import all enterprise components.
-	_ "github.com/redpanda-data/connect/v4/public/components/aws/enterprise"
-	_ "github.com/redpanda-data/connect/v4/public/components/cohere"
-	_ "github.com/redpanda-data/connect/v4/public/components/gcp/enterprise"
-	_ "github.com/redpanda-data/connect/v4/public/components/kafka/enterprise"
-	_ "github.com/redpanda-data/connect/v4/public/components/ollama"
-	_ "github.com/redpanda-data/connect/v4/public/components/openai"
-	_ "github.com/redpanda-data/connect/v4/public/components/postgresql"
-	_ "github.com/redpanda-data/connect/v4/public/components/snowflake"
-	_ "github.com/redpanda-data/connect/v4/public/components/splunk"
+	//_ "github.com/redpanda-data/connect/v4/public/components/aws/enterprise"
+	//_ "github.com/redpanda-data/connect/v4/public/components/cohere"
+	//_ "github.com/redpanda-data/connect/v4/public/components/gcp/enterprise"
+	//_ "github.com/redpanda-data/connect/v4/public/components/kafka/enterprise"
+	//_ "github.com/redpanda-data/connect/v4/public/components/ollama"
+	//_ "github.com/redpanda-data/connect/v4/public/components/openai"
+	//_ "github.com/redpanda-data/connect/v4/public/components/postgresql"
+	//_ "github.com/redpanda-data/connect/v4/public/components/snowflake"
+	//_ "github.com/redpanda-data/connect/v4/public/components/splunk"
 )

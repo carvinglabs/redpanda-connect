@@ -23,7 +23,8 @@ LD_FLAGS   ?= -w -s
 GO_FLAGS   ?=
 DOCS_FLAGS ?=
 
-APPS = redpanda-connect redpanda-connect-cloud redpanda-connect-community redpanda-connect-ai
+#APPS = redpanda-connect redpanda-connect-cloud redpanda-connect-community redpanda-connect-ai
+APPS = redpanda-connect-community
 all: $(APPS)
 
 install: $(APPS)
@@ -91,3 +92,44 @@ docs: $(APPS) $(TOOLS)
 	@$(PATHINSTBIN)/redpanda-connect lint --deprecated "./config/examples/*.yaml" \
 		"$(WEBSITE_DIR)/**/*.md"
 	@$(PATHINSTBIN)/redpanda-connect template lint "./config/template_examples/*.yaml"
+
+build-darwin:
+	GOOS=darwin GOARCH=arm64 go build $(GO_FLAGS) -tags "$(TAGS)" -ldflags "$(LD_FLAGS) $(VER_FLAGS)" -o ./target/bin/darwin/redpanda-connect-community ./cmd/redpanda-connect-community/main.go
+build-linux:
+	GOOS=linux GOARCH=amd64 go build $(GO_FLAGS) -tags "$(TAGS)" -ldflags "$(LD_FLAGS) $(VER_FLAGS)" -o ./target/bin/linux/redpanda-connect-community ./cmd/redpanda-connect-community/main.go
+
+build: build-darwin build-linux
+
+deploy_qlf: build-linux
+	scp ./target/bin/linux/redpanda-connect-community cw-qlf-worker-par1-1:/home/ubuntu/benthos
+	ssh cw-qlf-worker-par1-1 chmod +x /home/ubuntu/benthos; ssh cw-qlf-worker-par1-1 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+
+deploy_test: build-linux
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-1:/home/ubuntu/benthos
+	#ssh cw-worker-gra3-1 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-1 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+
+deploy_prod: build-linux
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-1:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-2:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-3:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-4:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-5:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-6:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-7:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-8:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-9:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-10:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-11:/home/ubuntu/benthos
+	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-12:/home/ubuntu/benthos
+	ssh cw-worker-gra3-1 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-1 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-2 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-2 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-3 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-3 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-4 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-4 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-5 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-5 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-6 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-6 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-7 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-7 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-8 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-8 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-9 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-9 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-10 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-10 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-11 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-11 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	ssh cw-worker-gra3-12 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-12 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
