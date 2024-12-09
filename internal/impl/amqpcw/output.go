@@ -468,8 +468,6 @@ func (a *amqpCWWriter) Write(ctx context.Context, msg *service.Message) error {
 		return fmt.Errorf("msg serialization error: %w", err)
 	}
 
-	fmt.Println(string(out))
-
 	if encoding == "base64" {
 		msgBytes = []byte(b64.StdEncoding.EncodeToString(out))
 	} else {
