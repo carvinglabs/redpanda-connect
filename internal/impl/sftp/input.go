@@ -35,6 +35,7 @@ const (
 	siFieldPaths               = "paths"
 	siFieldDeleteOnFinish      = "delete_on_finish"
 	siFieldRenameOnFinish      = "rename_on_finish"
+	siFieldRenameOnDownload    = "rename_on_download"
 	siFieldWatcher             = "watcher"
 	siFieldWatcherEnabled      = "enabled"
 	siFieldWatcherMinimumAge   = "minimum_age"
@@ -75,6 +76,10 @@ You can access these metadata fields using xref:configuration:interpolation.adoc
 				Description("Whether to rename files on the server once they are processed.").
 				Advanced().
 				Default(false),
+			service.NewBoolField(siFieldRenameOnDownload).
+				Description("Whether to rename files on the server as soon as they are downloaded, before processing.").
+				Advanced().
+				Default(true),
 			service.NewObjectField(siFieldWatcher,
 				service.NewBoolField(siFieldWatcherEnabled).
 					Description("Whether file watching is enabled.").
@@ -115,12 +120,13 @@ type sftpReader struct {
 	mgr *service.Resources
 
 	// Config
-	address        string
-	paths          []string
-	creds          credentials
-	scannerCtor    codec.DeprecatedFallbackCodec
-	deleteOnFinish bool
-	renameOnFinish bool
+	address          string
+	paths            []string
+	creds            credentials
+	scannerCtor      codec.DeprecatedFallbackCodec
+	deleteOnFinish   bool
+	renameOnFinish   bool
+	renameOnDownload bool
 
 	watcherEnabled      bool
 	watcherCache        string
@@ -158,6 +164,9 @@ func newSFTPReaderFromParsed(conf *service.ParsedConfig, mgr *service.Resources)
 		return
 	}
 	if s.renameOnFinish, err = conf.FieldBool(siFieldRenameOnFinish); err != nil {
+		return
+	}
+	if s.renameOnDownload, err = conf.FieldBool(siFieldRenameOnDownload); err != nil {
 		return
 	}
 
@@ -232,6 +241,19 @@ func (s *sftpReader) Connect(ctx context.Context) (err error) {
 				_ = s.pathProvider.Ack(ctx, nextPath, err)
 			}
 		} else {
+			// If renameOnDownload is enabled, rename the file immediately after opening
+			if s.renameOnDownload {
+				newPath := fmt.Sprintf("%s.downloaded-%d", nextPath, time.Now().Unix())
+				s.log.Infof("Renaming file on download to: %s", newPath)
+				if renameErr := s.client.Rename(nextPath, newPath); renameErr != nil {
+					s.log.With("error", renameErr).Errorf("Failed to rename file %v to %v on download", nextPath, newPath)
+					_ = file.Close()
+					_ = s.pathProvider.Ack(ctx, nextPath, renameErr)
+					continue
+				}
+				// Update the path in metadata since we've renamed it
+				nextPath = newPath
+			}
 			break
 		}
 	}
