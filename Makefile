@@ -115,21 +115,10 @@ deploy_prod: build-linux
 	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-4:/home/ubuntu/benthos
 	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-5:/home/ubuntu/benthos
 	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-6:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-7:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-8:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-9:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-10:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-11:/home/ubuntu/benthos
-	scp ./target/bin/linux/redpanda-connect-community cw-worker-gra3-12:/home/ubuntu/benthos
 	ssh cw-worker-gra3-1 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-1 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
 	ssh cw-worker-gra3-2 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-2 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
 	ssh cw-worker-gra3-3 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-3 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
 	ssh cw-worker-gra3-4 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-4 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
 	ssh cw-worker-gra3-5 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-5 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
 	ssh cw-worker-gra3-6 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-6 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-7 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-7 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-8 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-8 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-9 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-9 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-10 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-10 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-11 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-11 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
-	ssh cw-worker-gra3-12 chmod +x /home/ubuntu/benthos; ssh cw-worker-gra3-12 sudo mv /home/ubuntu/benthos /usr/local/bin/benthos
+	
