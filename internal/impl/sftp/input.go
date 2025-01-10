@@ -79,7 +79,7 @@ You can access these metadata fields using xref:configuration:interpolation.adoc
 			service.NewBoolField(siFieldRenameOnDownload).
 				Description("Whether to rename files on the server as soon as they are downloaded, before processing.").
 				Advanced().
-				Default(true),
+				Default(false),
 			service.NewObjectField(siFieldWatcher,
 				service.NewBoolField(siFieldWatcherEnabled).
 					Description("Whether file watching is enabled.").

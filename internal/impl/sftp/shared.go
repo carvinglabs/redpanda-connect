@@ -86,6 +86,20 @@ func (c credentials) GetClient(fs fs.FS, address string) (*sftp.Client, error) {
 		User:            c.Username,
 		Auth:            []ssh.AuthMethod{},
 		HostKeyCallback: certCheck.CheckHostKey,
+		// Add this line to specify allowed ciphers
+		Config: ssh.Config{
+			Ciphers: []string{
+				"aes128-gcm@openssh.com",
+				"aes256-gcm@openssh.com",
+				"chacha20-poly1305@openssh.com",
+				"aes128-ctr",
+				"aes192-ctr",
+				"aes256-ctr",
+				"aes128-cbc",
+				"aes192-cbc",
+				"aes256-cbc",
+			},
+		},
 	}
 
 	// set password auth when provided
