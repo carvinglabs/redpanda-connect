@@ -75,6 +75,8 @@ func parseSecretsLookupURN(ctx context.Context, logger *slog.Logger, urn string)
 		}, nil
 	case "redis":
 		return newRedisSecretsLookup(ctx, logger, u)
+	case "mysql":
+		return newMySQLSecretsLookup(ctx, logger, u)
 	case "env":
 		return func(ctx context.Context, key string) (string, bool) {
 			return os.LookupEnv(key)
